@@ -17,7 +17,7 @@ export default function TestSelection({ onStartTest }) {
   };
 
   useEffect(() => {
-    fetch('/tests/registry.json')
+    fetch(`${import.meta.env.BASE_URL}tests/registry.json`)
       .then(res => res.json())
       .then(data => {
         setTestsData(data);

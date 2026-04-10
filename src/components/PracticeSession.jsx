@@ -45,7 +45,7 @@ export default function PracticeSession({ test, onFinish }) {
       });
     };
 
-    fetch(`/tests/${test.id}/questions.json`)
+    fetch(`${import.meta.env.BASE_URL}tests/${test.id}/questions.json`)
       .then(res => res.json())
       .then(data => {
         setQuestions(processData(data));
@@ -180,7 +180,7 @@ export default function PracticeSession({ test, onFinish }) {
         {currentQ.image && (
           <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
             <img 
-              src={`/tests/${test.id}/${currentQ.image}`} 
+              src={`${import.meta.env.BASE_URL}tests/${test.id}/${currentQ.image}`} 
               alt="שאלה" 
               style={{ maxWidth: '100%', borderRadius: '8px' }} 
             />
