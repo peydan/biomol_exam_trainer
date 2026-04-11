@@ -39,7 +39,10 @@ export default function PracticeSession({ test, onFinish }) {
     const processData = (qData) => {
       return qData.map(q => {
         const scrambledOptions = shuffleArray(
-          q.options.map((text, idx) => ({ text, isCorrect: idx === 0 }))
+          q.options.map((text) => ({ 
+            text, 
+            isCorrect: text === q.correctAnswer 
+          }))
         );
         return { ...q, scrambledOptions };
       });
@@ -88,7 +91,7 @@ export default function PracticeSession({ test, onFinish }) {
 
   const handleSubmit = () => {
     if (userSelections[currentIndex] === undefined) return;
-    setFinalizedAnswers(prev => ({ ...prev, [currentIndex]: true }));
+    setFinalizedAnswers(prev => ({ ...prev, [currentIndex]: userSelections[currentIndex] }));
   };
 
   const handleNext = () => {
@@ -99,10 +102,9 @@ export default function PracticeSession({ test, onFinish }) {
 
   const calculateFinalScore = () => {
     let scoreCount = 0;
-    Object.entries(userSelections).forEach(([qIdxStr, optIdx]) => {
+    Object.entries(finalizedAnswers).forEach(([qIdxStr, selectedIdx]) => {
       const qIdx = parseInt(qIdxStr);
-      // Only count if it's actually finalized
-      if (finalizedAnswers[qIdx] && questions[qIdx].scrambledOptions[optIdx].isCorrect) {
+      if (questions[qIdx] && questions[qIdx].scrambledOptions[selectedIdx]?.isCorrect) {
         scoreCount += 1;
       }
     });
@@ -132,7 +134,12 @@ export default function PracticeSession({ test, onFinish }) {
   if (!loading && questions.length === 0) return <div>המבחן ריק או לא נמצא</div>;
 
   if (isFinished) {
-    return <ScoreBoard score={calculateFinalScore()} total={questions.length} onHome={onFinish} />;
+    return <ScoreBoard 
+      score={calculateFinalScore()} 
+      total={questions.length} 
+      reviewData={{ questions, finalizedAnswers, testId: test.id }}
+      onHome={onFinish} 
+    />;
   }
 
   const currentQ = questions[currentIndex];
@@ -143,16 +150,16 @@ export default function PracticeSession({ test, onFinish }) {
 
   if (showConfirm) {
     return (
-      <div className="fade-in glass-panel" style={{ width: '100%', textAlign: 'center', padding: '2rem' }}>
-        <h2 style={{ color: 'var(--text-primary)', marginBottom: '1.5rem' }}>האם אתה בטוח שברצונך לסיים את המבחן?</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+      <div className="fade-in glass-panel confirm-dialog">
+        <h2 className="confirm-title">האם אתה בטוח שברצונך לסיים את המבחן?</h2>
+        <p className="confirm-text">
           ענית על {Object.keys(finalizedAnswers).length} מתוך {questions.length} שאלות.
         </p>
-        <div className="flex gap-4" style={{ justifyContent: 'center' }}>
-          <button className="glass-button primary" onClick={handleConfirmFinish} style={{ width: '120px' }}>
+        <div className="flex gap-4 confirm-buttons">
+          <button className="glass-button primary confirm-button" onClick={handleConfirmFinish}>
             כן, סיים
           </button>
-          <button className="glass-button" onClick={() => setShowConfirm(false)} style={{ width: '120px' }}>
+          <button className="glass-button confirm-button" onClick={() => setShowConfirm(false)}>
             חזור למבחן
           </button>
         </div>
@@ -161,14 +168,13 @@ export default function PracticeSession({ test, onFinish }) {
   }
 
   return (
-    <div className="fade-in" style={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="fade-in w-full flex-col" style={{ height: '100%' }}>
       <div className="flex justify-between items-center mb-4 text-secondary">
-        <button className="glass-button" style={{ padding: '0.4rem 1rem' }} onClick={onFinish}>
+        <button className="glass-button top-bar-button" onClick={onFinish}>
           יציאה והשהייה
         </button>
         <button 
-          className={`glass-button ${allAnswered ? 'success' : ''}`}
-          style={{ padding: '0.4rem 1rem' }} 
+          className={`glass-button top-bar-button ${allAnswered ? 'success' : ''}`}
           onClick={handleFinishTest}
         >
           סיים מבחן
@@ -176,13 +182,13 @@ export default function PracticeSession({ test, onFinish }) {
       </div>
 
       <div className="glass-panel mb-4 fade-in" key={`q-${currentIndex}`}>
-        <h2 style={{ whiteSpace: 'pre-wrap' }}>{renderGreekLetters(currentQ.question)}</h2>
+        <h2 className="whitespace-pre-wrap">{renderGreekLetters(currentQ.question)}</h2>
         {currentQ.image && (
-          <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+          <div className="question-image-container">
             <img 
               src={`${import.meta.env.BASE_URL}tests/${test.id}/${currentQ.image}`} 
               alt="שאלה" 
-              style={{ maxWidth: '100%', borderRadius: '8px' }} 
+              className="question-image"
             />
           </div>
         )}
@@ -211,24 +217,18 @@ export default function PracticeSession({ test, onFinish }) {
         })}
       </div>
 
-      <div className="flex justify-center" style={{ marginTop: '2rem' }}>
+      <div className="flex justify-center mt-6">
         {!isCurrentFinalized ? (
           <button 
-            className="glass-button primary w-full" 
             onClick={handleSubmit}
             disabled={currentSelection === undefined}
-            style={{ opacity: currentSelection === undefined ? 0.5 : 1 }}
+            className={`glass-button primary w-full ${currentSelection === undefined ? 'action-button-disabled' : ''}`}
           >
             אישור
           </button>
         ) : (
           <button 
-            className="glass-button w-full" 
-            style={{ 
-              background: currentIndex < questions.length - 1 ? 'var(--text-primary)' : 'var(--glass-bg)', 
-              color: currentIndex < questions.length - 1 ? 'var(--secondary)' : 'var(--text-primary)',
-              opacity: currentIndex === questions.length - 1 ? 0.5 : 1
-            }}
+            className={`glass-button w-full ${currentIndex < questions.length - 1 ? 'next-button-active' : 'next-button-inactive'}`}
             onClick={handleNext}
             disabled={currentIndex === questions.length - 1}
           >
@@ -238,7 +238,7 @@ export default function PracticeSession({ test, onFinish }) {
       </div>
 
       {/* Question Map Section at the bottom */}
-      <div className="flex justify-center" style={{ marginTop: '2rem' }}>
+      <div className="flex justify-center map-toggle-container">
         <button 
           className="glass-button w-full" 
           onClick={() => setIsMapOpen(!isMapOpen)}
@@ -248,14 +248,14 @@ export default function PracticeSession({ test, onFinish }) {
       </div>
 
       {isMapOpen && (
-        <div className="question-map-container glass-panel fade-in" ref={mapRef} style={{ padding: '1rem' }}>
+        <div className="question-map-container glass-panel fade-in map-container" ref={mapRef}>
           {questions.map((_, idx) => {
-            const isAnswered = finalizedAnswers[idx];
-            const selection = userSelections[idx];
+            const selectedIdx = finalizedAnswers[idx];
+            const isAnswered = selectedIdx !== undefined;
             let statusClass = '';
             
-            if (isAnswered && selection !== undefined) {
-               const isCorrect = questions[idx].scrambledOptions[selection].isCorrect;
+            if (isAnswered) {
+               const isCorrect = questions[idx].scrambledOptions[selectedIdx].isCorrect;
                statusClass = isCorrect ? 'answered-correct' : 'answered-incorrect';
             }
 

@@ -239,3 +239,104 @@ p {
 .justify-between { justify-content: space-between; }
 .text-center { text-align: center; }
 .w-full { width: 100%; }
+.whitespace-pre-wrap { white-space: pre-wrap; }
+
+/* Review Section Styles */
+.review-question-item {
+  transition: all 0.2s ease;
+}
+
+.review-question-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.review-option {
+  transition: all 0.2s ease;
+}
+
+.review-correct {
+  border-color: var(--success) !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+}
+
+.review-user-answer {
+  border-width: 2px !important;
+}
+
+.review-user-answer:not(.review-correct) {
+  border-color: var(--error) !important;
+  background: rgba(239, 68, 68, 0.15) !important;
+}
+
+/* Additional utility classes */
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.p-4 { padding: 1rem; }
+.rounded-lg { border-radius: 12px; }
+.cursor-pointer { cursor: pointer; }
+
+/* Component-specific styles */
+.confirm-dialog {
+  width: 100%;
+  text-align: center;
+  padding: 2rem;
+}
+
+.confirm-title {
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.confirm-text {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.confirm-buttons {
+  justify-content: center;
+}
+
+.confirm-button {
+  width: 120px;
+}
+
+.top-bar-button {
+  padding: 0.4rem 1rem;
+}
+
+.question-image-container {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.question-image {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.action-button-disabled {
+  opacity: 0.5;
+}
+
+.next-button-active {
+  background: var(--text-primary);
+  color: var(--secondary);
+}
+
+.next-button-inactive {
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  opacity: 0.5;
+}
+
+.map-toggle-container {
+  margin-top: 2rem;
+}
+
+.map-container {
+  padding: 1rem;
+}

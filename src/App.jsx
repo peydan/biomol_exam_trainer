@@ -1,29 +1,49 @@
-import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom'
 import './index.css'
 import TestSelection from './components/TestSelection'
 import PracticeSession from './components/PracticeSession'
 
-function App() {
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'practice'
-  const [selectedTest, setSelectedTest] = useState(null);
-
+function HomePage() {
+  const navigate = useNavigate();
+  
   const startTest = (testMetadata, attemptId = null) => {
-    setSelectedTest({ ...testMetadata, attemptId });
-    setCurrentView('practice');
+    if (attemptId) {
+      navigate(`/test/${testMetadata.id}/${attemptId}`);
+    } else {
+      navigate(`/test/${testMetadata.id}`);
+    }
+  };
+
+  return <TestSelection onStartTest={startTest} />;
+}
+
+function TestPage() {
+  const { testId, attemptId } = useParams();
+  const navigate = useNavigate();
+  
+  const testMetadata = {
+    id: testId,
+    attemptId: attemptId || null,
+    title: testId ? `מבחן ${testId}` : 'מבחן',
+    description: 'טוען...'
   };
 
   const endTest = () => {
-    setSelectedTest(null);
-    setCurrentView('home');
+    navigate('/');
   };
 
+  return <PracticeSession test={testMetadata} onFinish={endTest} />;
+}
+
+function App() {
   return (
-    <>
-      {currentView === 'home' && <TestSelection onStartTest={startTest} />}
-      {currentView === 'practice' && selectedTest && (
-        <PracticeSession test={selectedTest} onFinish={endTest} />
-      )}
-    </>
+    <BrowserRouter basename="/biomol_exam_trainer">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/test/:testId" element={<TestPage />} />
+        <Route path="/test/:testId/:attemptId" element={<TestPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
