@@ -51,7 +51,8 @@ export default function PracticeSession({ test, onFinish }) {
     fetch(`${import.meta.env.BASE_URL}tests/${test.id}/questions.json`)
       .then(res => res.json())
       .then(data => {
-        setQuestions(processData(data));
+        const dataArray = Array.isArray(data) ? data : Object.values(data);
+        setQuestions(processData(dataArray));
         setLoading(false);
       })
       .catch(err => {
