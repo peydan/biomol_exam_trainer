@@ -86,7 +86,7 @@ export default function PracticeSession({ test, onFinish }) {
   }, [currentIndex]);
 
   const handleSelect = (optIndex) => {
-    if (finalizedAnswers[currentIndex]) return;
+    if (finalizedAnswers[currentIndex] !== undefined) return;
     setUserSelections(prev => ({ ...prev, [currentIndex]: optIndex }));
   };
 
@@ -145,7 +145,7 @@ export default function PracticeSession({ test, onFinish }) {
 
   const currentQ = questions[currentIndex];
   const currentSelection = userSelections[currentIndex];
-  const isCurrentFinalized = finalizedAnswers[currentIndex];
+  const isCurrentFinalized = finalizedAnswers[currentIndex] !== undefined;
 
   const allAnswered = Object.keys(finalizedAnswers).length === questions.length;
 
